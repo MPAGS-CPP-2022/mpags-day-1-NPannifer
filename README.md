@@ -3,4 +3,4 @@ A simple command line tool for encrypting/decrypting text using classical cipher
 
 Only because I was asked to, I have added this line of text.
 
-Documentation
+Bocumentation
