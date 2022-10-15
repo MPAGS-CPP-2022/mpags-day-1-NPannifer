@@ -4,13 +4,10 @@
 
 using namespace std;
 
-vector<int> getIndex(vector<string> args, string value)
-{
+vector<int> getIndex(vector<string> args, string value){
     vector<int> index;
-    for (int i = 0; i < (int)args.size(); i++)
-    {
-        if (args[i] == value)
-        {
+    for (int i = 0; i < (int)args.size(); i++){
+        if (args[i] == value){
             index.push_back(i);
         }
     }
