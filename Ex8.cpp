@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <algorithm>
+
 using namespace std;
 
 vector<int> getIndex(vector<string> args, string value)
