@@ -4,6 +4,11 @@
 
 using namespace std;
 
+/*
+I have attempted to write clean(ish) code, but not really succeeded.
+For no good reason have used 0/-1 instead of bools.
+*/
+
 vector<int> getIndexList(vector<string> args, string value)
 {
     vector<int> index;
@@ -17,14 +22,25 @@ vector<int> getIndexList(vector<string> args, string value)
     return index;
 }
 
-int checkFileIndex(vector<int> argsIndex)
+bool doesIndexExist(vector<int> argsIndex)
 {
     int numberOfFiles{(int)argsIndex.size()};
-    if (numberOfFiles>1)
-        {
-            return -1;
-        }
-    return 0;
+    if(numberOfFiles)
+    {
+        return true;
+    }
+    return false;
+
+}
+
+bool isIndexSingle(vector<int> argsIndex)
+{
+    int numberOfEntries{(int)argsIndex.size()};
+    if (numberOfEntries>1)
+    {
+        return false;
+    }
+    return true;
 }
 
 int convertListToInt(vector<int> indexList)
@@ -86,36 +102,49 @@ int main(int argc, char* argv[])
     {
         cout << "**INSERT VERSION NUMBER HERE**" << "\n" << endl;
     }
+    
+    string inputFileName{""};
+    string outputFileName{""}; 
 
     int inputFileNameCheck{0};
     int outputFileNameCheck{0};
-    string inputFileName{""};
-    string outputFileName{""};
 
-    int inputArgIndex{convertListToInt(whereInputFile)};
-    int inputArgIndexCheck{checkFileIndex(whereInputFile)};
-    if (inputArgIndexCheck)
-    {
+    bool inputExists{doesIndexExist(whereInputFile)};
+    bool outputExists{doesIndexExist(whereOutputFile)};
+    bool singleInput{isIndexSingle(whereInputFile)};
+    bool singleOutput{isIndexSingle(whereOutputFile)};
+
+    
+    if (inputExists && singleInput)
+    {   
+        int inputArgIndex{convertListToInt(whereInputFile)};
         inputFileName = getFileName(cmdLineArgs,inputArgIndex);
         inputFileNameCheck = checkFileName(inputFileName);
     }
  
-    int outputArgIndex{convertListToInt(whereOutputFile)};
-    int outputArgIndexCheck{checkFileIndex(whereOutputFile)};
-    if (outputArgIndexCheck)
-    {
+    if (outputExists && singleOutput)
+    {   
+        int outputArgIndex{convertListToInt(whereOutputFile)};
         outputFileName = getFileName(cmdLineArgs,outputArgIndex);
         outputFileNameCheck = checkFileName(outputFileName);
     }
-  
-    if(inputArgIndexCheck||outputArgIndexCheck||inputFileNameCheck||outputFileNameCheck)
+
+    printWarnings(!singleInput,!singleOutput,inputFileNameCheck,outputFileNameCheck);
+
+    if(!singleInput||!singleOutput||inputFileNameCheck||outputFileNameCheck)
     {
-        printWarnings(inputArgIndexCheck,outputArgIndexCheck,inputFileNameCheck,outputFileNameCheck);
         return -1;
     }
 
-    cout << "Input file: " << inputFileName << endl;
-    cout << "Output file: " << outputFileName << endl;
+    if (inputExists)
+    {
+        cout << "Input file: " << inputFileName << endl;
+    }
+
+    if (outputExists)
+    {
+        cout << "Output file: " << outputFileName << endl;
+    }
 
     cout << "\n" << "Listing command line args:" << endl;
     for(int i = 1; i< (int)cmdLineArgs.size(); i++)
