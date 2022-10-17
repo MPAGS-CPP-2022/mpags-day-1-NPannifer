@@ -1,13 +1,85 @@
-#include <iostream>
-#include <vector>
-#include <string>
-
-using namespace std;
+#include "Ex8_header.h"
 
 /*
 I have attempted to write clean(ish) code, but not really succeeded.
-For no good reason have used 0/-1 instead of bools.
+
+To do:
+- Handle Case where no file name specified (e.g. when running ./Ex8 -o)
 */
+
+int main(int argc, char* argv[])
+{
+    const vector<string> cmdLineArgs {argv, argv+argc};
+
+    vector<int> whereH          = getIndexList(cmdLineArgs, "-h");
+    vector<int> whereHelp       = getIndexList(cmdLineArgs, "--help");
+    vector<int> whereVersion    = getIndexList(cmdLineArgs, "--version");
+    vector<int> whereInputFile  = getIndexList(cmdLineArgs, "-i");
+    vector<int> whereOutputFile = getIndexList(cmdLineArgs, "-o");
+
+    if (whereH.size() + whereHelp.size())
+    {
+        cout << "**INSERT HELPFUL TEXT HERE**" << "\n" << endl;
+    }
+
+    if (whereVersion.size())
+    {
+        cout << "**INSERT VERSION NUMBER HERE**" << "\n" << endl;
+    }
+    
+    string inputFileName{""};
+    string outputFileName{""}; 
+
+    int inputFileNameCheck{0};
+    int outputFileNameCheck{0};
+
+    bool inputExists{doesIndexExist(whereInputFile)};
+    bool outputExists{doesIndexExist(whereOutputFile)};
+    bool singleInput{isIndexSingle(whereInputFile)};
+    bool singleOutput{isIndexSingle(whereOutputFile)};
+
+    
+    if (inputExists && singleInput)
+    {   
+        int inputArgIndex{convertListToInt(whereInputFile)};
+        inputFileName = getFileName(cmdLineArgs,inputArgIndex);
+        inputFileNameCheck = checkFileName(inputFileName);
+    }
+ 
+    if (outputExists && singleOutput)
+    {   
+        int outputArgIndex{convertListToInt(whereOutputFile)};
+        outputFileName = getFileName(cmdLineArgs,outputArgIndex);
+        outputFileNameCheck = checkFileName(outputFileName);
+    }
+
+    printWarnings(!singleInput,!singleOutput,inputFileNameCheck,outputFileNameCheck);
+
+    if(!singleInput||!singleOutput||inputFileNameCheck||outputFileNameCheck)
+    {
+        return -1;
+    }
+
+    if (inputExists)
+    {
+        cout << "Input file: " << inputFileName << endl;
+    }
+
+    if (outputExists)
+    {
+        cout << "Output file: " << outputFileName << endl;
+    }
+
+    cout << "\n" << "Listing command line args:" << endl;
+    for(int i = 1; i< (int)cmdLineArgs.size(); i++)
+    {      
+        cout << cmdLineArgs.at(i) << endl;
+    }
+    
+    return 0;
+}
+
+
 
 vector<int> getIndexList(vector<string> args, string value)
 {
@@ -81,76 +153,4 @@ void printWarnings(int check1, int check2, int check3, int check4)
         cout << "Error: output file name cannot be option/flag" << endl;
     }
     return;
-}
-
-int main(int argc, char* argv[])
-{
-    const vector<string> cmdLineArgs {argv, argv+argc};
-
-    vector<int> whereH          = getIndexList(cmdLineArgs, "-h");
-    vector<int> whereHelp       = getIndexList(cmdLineArgs, "--help");
-    vector<int> whereVersion    = getIndexList(cmdLineArgs, "--version");
-    vector<int> whereInputFile  = getIndexList(cmdLineArgs, "-i");
-    vector<int> whereOutputFile = getIndexList(cmdLineArgs, "-o");
-
-    if (whereH.size() + whereHelp.size())
-    {
-        cout << "**INSERT HELPFUL TEXT HERE**" << "\n" << endl;
-    }
-
-    if (whereVersion.size())
-    {
-        cout << "**INSERT VERSION NUMBER HERE**" << "\n" << endl;
-    }
-    
-    string inputFileName{""};
-    string outputFileName{""}; 
-
-    int inputFileNameCheck{0};
-    int outputFileNameCheck{0};
-
-    bool inputExists{doesIndexExist(whereInputFile)};
-    bool outputExists{doesIndexExist(whereOutputFile)};
-    bool singleInput{isIndexSingle(whereInputFile)};
-    bool singleOutput{isIndexSingle(whereOutputFile)};
-
-    
-    if (inputExists && singleInput)
-    {   
-        int inputArgIndex{convertListToInt(whereInputFile)};
-        inputFileName = getFileName(cmdLineArgs,inputArgIndex);
-        inputFileNameCheck = checkFileName(inputFileName);
-    }
- 
-    if (outputExists && singleOutput)
-    {   
-        int outputArgIndex{convertListToInt(whereOutputFile)};
-        outputFileName = getFileName(cmdLineArgs,outputArgIndex);
-        outputFileNameCheck = checkFileName(outputFileName);
-    }
-
-    printWarnings(!singleInput,!singleOutput,inputFileNameCheck,outputFileNameCheck);
-
-    if(!singleInput||!singleOutput||inputFileNameCheck||outputFileNameCheck)
-    {
-        return -1;
-    }
-
-    if (inputExists)
-    {
-        cout << "Input file: " << inputFileName << endl;
-    }
-
-    if (outputExists)
-    {
-        cout << "Output file: " << outputFileName << endl;
-    }
-
-    cout << "\n" << "Listing command line args:" << endl;
-    for(int i = 1; i< (int)cmdLineArgs.size(); i++)
-    {      
-        cout << cmdLineArgs.at(i) << endl;
-    }
-    
-    return 0;
 }
