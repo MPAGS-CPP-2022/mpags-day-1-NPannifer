@@ -4,11 +4,12 @@
 
 using namespace std;
 
-vector<int> getIndex(vector<string> args, string value){
+vector<int> getIndexList(vector<string> args, string value)
+{
     vector<int> index;
     for (int i = 0; i < (int)args.size(); i++)
     {
-        if (args[i] == value)
+        if (args.at(i) == value)
         {
             index.push_back(i);
         }
@@ -16,24 +17,65 @@ vector<int> getIndex(vector<string> args, string value){
     return index;
 }
 
+int checkFileIndex(vector<int> argsIndex)
+{
+    int numberOfFiles{(int)argsIndex.size()};
+    if (numberOfFiles>1)
+        {
+            return -1;
+        }
+    return 0;
+}
+
+int convertListToInt(vector<int> indexList)
+{
+    return indexList.at(0);
+}
+
+string getFileName(vector<string> args, int flagIndex)
+{
+    string fileName{args.at(flagIndex+1)};
+    return fileName;
+}
+
+int checkFileName(string fileName){
+    if(fileName[0] == '-')
+    {
+        return -1;
+    }
+    return 0;
+}
+
+void printWarnings(int check1, int check2, int check3, int check4)
+{
+    if(check1)
+    {
+        cout << "Error: cannot have multiple input files." << endl;
+    }
+    if(check2)
+    {
+        cout << "Error: cannot have multiple output files." << endl;
+    }
+    if(check3)
+    {
+        cout << "Error: input file name cannot be option/flag" << endl;
+    }
+    if(check4)
+    {
+        cout << "Error: output file name cannot be option/flag" << endl;
+    }
+    return;
+}
+
 int main(int argc, char* argv[])
 {
-    const vector<string> cmdLineArgs { argv, argv+argc };
+    const vector<string> cmdLineArgs {argv, argv+argc};
 
-    string inputFileName{""};
-    string outputFileName{""};
-    int inputFileIndex{0};
-    int outputFileIndex{0};
-   
-    vector<int> whereH          = getIndex(cmdLineArgs, "-h");
-    vector<int> whereHelp       = getIndex(cmdLineArgs, "--help");
-    vector<int> whereVersion    = getIndex(cmdLineArgs, "--version");
-    vector<int> whereInputFile  = getIndex(cmdLineArgs, "-i");
-    vector<int> whereOutputFile = getIndex(cmdLineArgs, "-o");
-
-    int numberOfInputFiles{(int)whereInputFile.size()};
-    int numberOfOutputFiles{(int)whereOutputFile.size()};
-
+    vector<int> whereH          = getIndexList(cmdLineArgs, "-h");
+    vector<int> whereHelp       = getIndexList(cmdLineArgs, "--help");
+    vector<int> whereVersion    = getIndexList(cmdLineArgs, "--version");
+    vector<int> whereInputFile  = getIndexList(cmdLineArgs, "-i");
+    vector<int> whereOutputFile = getIndexList(cmdLineArgs, "-o");
 
     if (whereH.size() + whereHelp.size())
     {
@@ -44,53 +86,41 @@ int main(int argc, char* argv[])
     {
         cout << "**INSERT VERSION NUMBER HERE**" << "\n" << endl;
     }
-    
 
-    if (numberOfInputFiles)
+    int inputFileNameCheck{0};
+    int outputFileNameCheck{0};
+    string inputFileName{""};
+    string outputFileName{""};
+
+    int inputArgIndex{convertListToInt(whereInputFile)};
+    int inputArgIndexCheck{checkFileIndex(whereInputFile)};
+    if (inputArgIndexCheck)
     {
-        if (numberOfInputFiles>1)
-        {
-            cout << "Error: cannot have multiple input files." << endl;
-            return -1;
-        }
-        else{
-            inputFileIndex = (int)whereInputFile[0];
-            inputFileName = cmdLineArgs[inputFileIndex+1];
-
-            if(inputFileName[0] == '-'){
-                cout << "Error: input file name cannot be option/flag" << endl;
-                return -1;
-            }
-
-            cout << "Input file: " << inputFileName << endl;
-        }
+        inputFileName = getFileName(cmdLineArgs,inputArgIndex);
+        inputFileNameCheck = checkFileName(inputFileName);
+    }
+ 
+    int outputArgIndex{convertListToInt(whereOutputFile)};
+    int outputArgIndexCheck{checkFileIndex(whereOutputFile)};
+    if (outputArgIndexCheck)
+    {
+        outputFileName = getFileName(cmdLineArgs,outputArgIndex);
+        outputFileNameCheck = checkFileName(outputFileName);
+    }
+  
+    if(inputArgIndexCheck||outputArgIndexCheck||inputFileNameCheck||outputFileNameCheck)
+    {
+        printWarnings(inputArgIndexCheck,outputArgIndexCheck,inputFileNameCheck,outputFileNameCheck);
+        return -1;
     }
 
-    if (numberOfOutputFiles)
-    {
-        if (numberOfOutputFiles>1)
-        {
-            cout << "Error: cannot have multiple output files." << endl;
-            return -1;
-        }
-        else{
-            outputFileIndex = (int)whereOutputFile[0];
-            outputFileName = cmdLineArgs[outputFileIndex+1];
-
-            if(outputFileName[0] == '-'){
-                cout << "Error: output file name cannot be option/flag" << endl;
-                return -1;
-            }
-
-            cout << "Output file: " << outputFileName << endl;
-        }
-    }
-
+    cout << "Input file: " << inputFileName << endl;
+    cout << "Output file: " << outputFileName << endl;
 
     cout << "\n" << "Listing command line args:" << endl;
     for(int i = 1; i< (int)cmdLineArgs.size(); i++)
     {      
-        cout << cmdLineArgs[i] << endl;
+        cout << cmdLineArgs.at(i) << endl;
     }
     
     return 0;
